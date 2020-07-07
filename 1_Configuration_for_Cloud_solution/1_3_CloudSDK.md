@@ -1,5 +1,15 @@
 # コマンドライン インターフェース（CLI）
 
+## gcloud CLIとは
+
+Google Cloudリソースを作成、管理するためのCLIツール
+- Google CloudリソースとはCloudSLQやCompute EngineなどGoogle Cloudのサービス
+
+gcloud CLIはGoogle Cloud SDKの一部。事前にGoogle Cloud SKDをインストール、初期化しておく必要がある
+- Google Cloud SDKにはデフォルトで `gcloud`,`gsutil`, `bq`コマンドラインツールが含まれる。
+- 追加のコンポーネントをインストールするには`gcloud comopnents install`コマンドを使用するか、`deb`または`RPM`パッケージをインストールする。
+
+
 - cloud sdkにはPythonが必要
   - 推奨バージョンは3.5〜3.7、もしくは2.7.9以降
 
