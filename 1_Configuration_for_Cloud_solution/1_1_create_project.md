@@ -65,9 +65,9 @@ POST https://cloudresourcemanager.googleapis.com/v1/projects
 | ---- | ---- | ---- |
 |  projectNumber  |  int64  |  プロジェクト番号  |
 |  projectId  |  string  |  プロジェクトID  |
-|  lifecycleState  |  LifecycleState  |  ・・・  |
+|  lifecycleState  |  LifecycleState  |  ・・・ 　← projects.create()では指定できないのかもしれない |
 |  name  |  string  |  プロジェクト名  |
-|  createTime  |  Timestamp  |  作成日時  |
+|  createTime  |  Timestamp  |  作成日時 　← projects.create()では指定できないのかもしれない |
 |  labels  |  map  |  プロジェクトのラベル。mapでKVで設定する  |
 |  parent  |  ResourceId  |  親になる組織、またはフォルダのIDを設定する.typeは"organization"もしくは"folder"のみ設定可能  |
 
