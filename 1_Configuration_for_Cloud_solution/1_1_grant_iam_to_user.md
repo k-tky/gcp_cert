@@ -3,6 +3,7 @@
 ### Cloud IAM
 誰（ID）がどのリソースに対してどのようなアクセス権（ロール）を持つかを定義することにより、アクセス制御を管理する。  
 Cloud IAMは直接エンドユーザーに権限を付与はせず、ロールを介してメンバーに付与される。  
+認証されたメンバーがリソースにアクセスしようとするとIAMはリソースのIAMポリシーをチェックしてアクションが許可されているかどうかをチェックします。
 
 ### Cloud IAMのアクセス管理モデル
 ![Cloud IAMの仕組み](./1_1_grant_iam_to_user/iam-overview-basics.svg)
@@ -48,3 +49,53 @@ Cloud IAMは以下の3通りの方法で付与、剥奪、削除ができる
 - gcloudコマンド
 - REST API
 - クライアントライブラリ
+
+#### GCPコンソールからの付与
+- IAMと管理から設定する
+
+#### gcloudコマンドからの付与
+- gcloudの`add-iam-policy-binding`を利用して付与し、`remove-iam-policy-binding`を利用して削除する。
+
+コマンド例
+```
+gcloud GROUP add-iam-policy-binding RESOURCE --member=MENBER --role=ROLE
+```
+
+- GROUP  
+更新するIAMの単位。projectまたはorganizationを設定する
+
+- RESOURCE  
+リソースの名前。projectであればプロジェクトID、organizationであれば組織ID
+
+- MENBER  
+ロールを付与するユーザー、サービスアカウントなど。`MEMBER_TYPE:ID`で指定する。  
+ex.サービスアカウントの場合  
+`--member=serviceAccount:hogehoge.iam.gserviceaccount.com`
+ex.ユーザーの場合  
+`--member=user:hogehoge@gmail.com`
+
+メンバータイプがuserの場合は識別子に含まれるドメイン名はG SuiteドメインまたはCloud Identityドメインである必要がある。
+
+- ROLE
+ロールID。`roles/editor`などの`gcloud iam roles list`で取得できるname
+
+#### REST APIからの付与
+
+- エンドポイント  
+`https://iam.googleapis.com`
+
+詳細は以下ドキュメント  
+- [Identity and Access Management (IAM) API](https://cloud.google.com/iam/docs/reference/rest)
+
+#### クライアントライブラリからの付与
+- googleが各言語用のライブラリを作成しているのでそれを利用する
+
+## IAMポリシーの概要
+リソースへのアクセスはIAMポリシーによって管理される。ポリシーはユーザーアカウントやサービスアカウントなどメンバーをロールに関連づけるバインディングのコレクション。  
+JSONまたはYAMLで表現される。  
+
+#### IAMポリシーの更新
+リソースのポリシーの更新は全て`read-modify-write`パターンを利用する。  
+1. `getIamPolicy`で現在のポリシーを取得する
+2. 取得したポリシーを編集する
+3. `setIamPolicy`でポリシーを更新する
