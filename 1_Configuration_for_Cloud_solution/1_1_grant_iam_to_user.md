@@ -99,3 +99,70 @@ JSONまたはYAMLで表現される。
 1. `getIamPolicy`で現在のポリシーを取得する
 2. 取得したポリシーを編集する
 3. `setIamPolicy`でポリシーを更新する
+
+IAMポリシーの取得、更新は以下の方法がある  
+- gcloudコマンド
+- REST API
+- クライアントライブラリ
+
+##### gcloudコマンドによる取得、編集、更新
+1. IAMポリシーを取得する  
+プロジェクトのIAMポリシーの取得  
+`gcloud projects get-iam-policy PROJECT-ID --format=FORMAT > filepath`  
+組織のIAMポリシーの取得
+`gcloud organizations get-iam-policy ORGANIZATION-ID --format=FORMAT > filepath`  
+フォーマットはJSON、またはYAMLを指定できる
+
+2. IAMポリシーの編集
+取得したIAMポリシーをローカルで編集する
+
+3. IAMポリシーの設定
+編集したIAMポリシーを設定する  
+プロジェクトのIAMポリシーの設定
+`gcloud projects set-iam-policy PROJECT-ID filepath`
+組織のIAMポリシーの設定
+`gcloud organizations set-iam-policy ORGANIZATION-ID filepath`
+
+##### RESTAPIによる取得、編集、更新
+GOOGLE_APPLICATION_CREDENTIALS環境変数にサービスアカウントの鍵ファイル（json）を設定する
+1. IAMポリシーを取得する  
+プロジェクトのIAMポリシーの取得  →エラーになってできなかったので余裕があれば確認したい
+```
+curl -X POST \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
+-H "Content-Type: application/json; charset=utf-8" \
+-d @request.json \
+https://cloudresourcemanager.googleapis.com/v1/projects/project-id:getIamPolicy
+```
+
+2. IAMポリシーの編集
+取得したIAMポリシーをローカルで編集する
+
+3. IAMポリシーの設定
+編集したIAMポリシーを設定する  
+```
+curl -X POST \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
+-H "Content-Type: application/json; charset=utf-8" \
+-d @request.json \
+https://cloudresourcemanager.googleapis.com/v1/projects/project-id:setIamPolicy
+```
+
+ex
+- GCSにアクセスを行うため、GCSストレージにアクセス可能なサービスアカウントを作成する
+```
+# サービスアカウントの作成
+gcloud iam service-accounts create cloud-strage-service \
+    --description="cloud_strage_service" \
+    --display-name="cloud-strage-service-disp"
+
+# サービスアカウントにGCSのAdmin権限の付与
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+  --member serviceAccount:`gcloud iam service-accounts list | grep cloud-strage-service-disp | awk '{print $2}'` \
+  --role roles/editor
+
+# 作成したサービスアカウントのAPIキーを作成
+gcloud iam service-accounts keys create ./credential.json \
+  --iam-account `gcloud iam service-accounts list | grep cloud-strage-service-disp | awk '{print $2}'`
+
+```
